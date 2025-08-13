@@ -81,6 +81,21 @@ class ListDetailSortChoices(models.TextChoices):
     MEDIA_TYPE = "media_type", "Media Type"
 
 
+class DateFormatChoices(models.TextChoices):
+    """Choices for date display formats."""
+
+    YMD = "ymd", "YYYY-MM-DD"
+    DMY = "dmy", "DD/MM/YYYY"
+    MDY = "mdy", "MM/DD/YYYY"
+
+
+class TimeFormatChoices(models.TextChoices):
+    """Choices for time display formats."""
+
+    H12 = "12", "12-hour"
+    H24 = "24", "24-hour"
+
+
 class User(AbstractUser):
     """Custom user model."""
 
@@ -254,6 +269,18 @@ class User(AbstractUser):
         choices=ListDetailSortChoices.choices,
     )
 
+    date_format = models.CharField(
+        max_length=20,
+        default=DateFormatChoices.YMD,
+        choices=DateFormatChoices.choices,
+    )
+
+    time_format = models.CharField(
+        max_length=2,
+        default=TimeFormatChoices.H24,
+        choices=TimeFormatChoices.choices,
+    )
+
     notification_urls = models.TextField(
         blank=True,
         help_text="Apprise URLs for notifications",
@@ -368,6 +395,14 @@ class User(AbstractUser):
             models.CheckConstraint(
                 name="list_detail_sort_valid",
                 condition=models.Q(list_detail_sort__in=ListDetailSortChoices.values),
+            ),
+            models.CheckConstraint(
+                name="date_format_valid",
+                condition=models.Q(date_format__in=DateFormatChoices.values),
+            ),
+            models.CheckConstraint(
+                name="time_format_valid",
+                condition=models.Q(time_format__in=TimeFormatChoices.values),
             ),
             models.CheckConstraint(
                 name="tv_status_valid",

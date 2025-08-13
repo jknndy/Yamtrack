@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils import timezone
+from users import helpers
 
 from events.models import Event
 
@@ -24,7 +25,8 @@ class EventAdmin(admin.ModelAdmin):
     def formatted_datetime(self, obj):
         """Display datetime in a safe format, handling extreme values."""
         try:
-            return timezone.localtime(obj.datetime).strftime("%Y-%m-%d %H:%M")
+            localized = timezone.localtime(obj.datetime)
+            return helpers.format_datetime(localized)
         except (OverflowError, ValueError):
             return "Invalid date"
 

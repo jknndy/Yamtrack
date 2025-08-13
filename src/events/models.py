@@ -13,6 +13,7 @@ from django.db.models import (
     When,
 )
 from django.utils import timezone
+from users import helpers
 
 from app import media_type_config
 from app.models import TV, Item, MediaTypes, Season, Status
@@ -249,4 +250,4 @@ class Event(models.Model):
             return ""
 
         localized_value = timezone.localtime(self.datetime)
-        return f"at {localized_value.strftime('%H:%M')}"
+        return f"at {helpers.format_time(localized_value)}"

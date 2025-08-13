@@ -8,6 +8,41 @@ from django.utils import timezone
 import integrations
 
 
+DATE_FORMATS = {
+    "ymd": "%Y-%m-%d",
+    "dmy": "%d/%m/%Y",
+    "mdy": "%m/%d/%Y",
+}
+
+TIME_FORMATS = {
+    "24": "%H:%M",
+    "12": "%I:%M %p",
+}
+
+
+def format_date(value, user=None):
+    """Format a datetime value as a date using user preferences."""
+    value = timezone.localtime(value) if timezone.is_aware(value) else value
+    fmt_key = getattr(user, "date_format", "ymd")
+    fmt = DATE_FORMATS.get(fmt_key, DATE_FORMATS["ymd"])
+    return value.strftime(fmt)
+
+
+def format_time(value, user=None):
+    """Format a datetime value as a time using user preferences."""
+    value = timezone.localtime(value) if timezone.is_aware(value) else value
+    fmt_key = getattr(user, "time_format", "24")
+    fmt = TIME_FORMATS.get(fmt_key, TIME_FORMATS["24"])
+    formatted = value.strftime(fmt)
+    if fmt_key == "12":
+        return formatted.lstrip("0")
+    return formatted
+
+
+def format_datetime(value, user=None):
+    """Format a datetime value using user preferences for both date and time."""
+    return f"{format_date(value, user)} {format_time(value, user)}"
+
 def get_client_ip(request):
     """Return the client's IP address.
 
