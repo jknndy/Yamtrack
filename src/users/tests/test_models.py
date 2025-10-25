@@ -8,8 +8,10 @@ from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from django_celery_results.models import TaskResult
 
 from users.models import (
+    DateFormatChoices,
     HomeSortChoices,
     MediaTypes,
+    TimeFormatChoices,
 )
 
 
@@ -164,6 +166,30 @@ class UserUpdatePreferenceTests(TestCase):
         # Should change the value
         self.user.refresh_from_db()
         self.assertEqual(self.user.release_notifications_enabled, False)
+
+    def test_update_preference_date_format(self):
+        """Test updating the date_format preference."""
+        self.assertEqual(self.user.date_format, DateFormatChoices.YMD)
+        result = self.user.update_preference("date_format", DateFormatChoices.DMY)
+        self.assertEqual(result, DateFormatChoices.DMY)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.date_format, DateFormatChoices.DMY)
+
+    def test_update_preference_time_format(self):
+        """Test updating the time_format preference."""
+        self.assertEqual(self.user.time_format, TimeFormatChoices.H24)
+        result = self.user.update_preference("time_format", TimeFormatChoices.H12)
+        self.assertEqual(result, TimeFormatChoices.H12)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.time_format, TimeFormatChoices.H12)
+
+    def test_update_preference_time_format_invalid(self):
+        """Ensure invalid time_format values are ignored."""
+        self.assertEqual(self.user.time_format, TimeFormatChoices.H24)
+        result = self.user.update_preference("time_format", "25")
+        self.assertEqual(result, TimeFormatChoices.H24)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.time_format, TimeFormatChoices.H24)
 
 
 class UserGetImportTasksTests(TestCase):

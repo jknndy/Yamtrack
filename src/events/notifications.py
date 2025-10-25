@@ -10,6 +10,7 @@ from django.utils import formats, timezone
 from app.models import TV, MediaTypes, Season
 from app.templatetags import app_tags
 from events.models import INACTIVE_TRACKING_STATUSES, Event
+from users import helpers
 
 logger = logging.getLogger(__name__)
 
@@ -399,13 +400,13 @@ def deliver_notifications(user_releases, users, title):
             continue
 
         # Format notification
-        notification_body = format_notification(releases=releases)
+        notification_body = format_notification(user=user, releases=releases)
 
         # Send notification
         send_user_notification(user, urls, title, notification_body)
 
 
-def format_notification(releases):
+def format_notification(user, releases):
     """Format notification text for releases.
 
     Args:
@@ -444,7 +445,7 @@ def format_notification(releases):
             else:
                 # Convert to local timezone and format
                 local_dt = timezone.localtime(event.datetime)
-                time_str = local_dt.strftime("%H:%M")
+                time_str = helpers.format_time(local_dt, user)
                 notification_body.append(f"  • {event} ({time_str})")
 
         # Add a blank line between media types

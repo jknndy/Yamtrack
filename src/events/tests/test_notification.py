@@ -709,7 +709,7 @@ class NotificationTests(TestCase):
         """Test the format_notification function."""
         # Test with multiple media types
         releases = [self.anime_event, self.manga_event, self.season1_event]
-        notification_text = format_notification(releases)
+        notification_text = format_notification(self.user1, releases)
 
         # Verify text contains expected content
         self.assertIn("ANIME", notification_text)
@@ -723,7 +723,7 @@ class NotificationTests(TestCase):
 
         # Test with single media type
         releases = [self.anime_event]
-        notification_text = format_notification(releases)
+        notification_text = format_notification(self.user1, releases)
 
         # Verify text contains expected content
         self.assertIn("ANIME", notification_text)
